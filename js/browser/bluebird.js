@@ -1918,7 +1918,7 @@ function MappingPromiseArray(promises, fn, limit, _filter) {
     this._limit = limit;
     this._inFlight = 0;
     this._queue = limit >= 1 ? [] : EMPTY_ARRAY;
-    async.invoke(init, this, undefined);
+    init.call(this, undefined);
 }
 util.inherits(MappingPromiseArray, PromiseArray);
 function init() {this._init$(undefined, -2);}
@@ -2198,14 +2198,12 @@ Promise.prototype._progressUnchecked = function (progressValue) {
         }
 
         if (typeof handler === "function") {
-            async.invoke(this._doProgressWith, this, {
-                handler: handler,
-                promise: promise,
-                receiver: this._receiverAt(i),
-                value: progressValue
-            });
+            this._doProgressWith(({handler: handler,
+promise: promise,
+receiver: this._receiverAt(i),
+value: progressValue}));
         } else {
-            async.invoke(progress, promise, progressValue);
+            progress.call(promise, progressValue);
         }
     }
 };
@@ -2426,8 +2424,7 @@ Promise.prototype._then = function (
         target._addCallbacks(didFulfill, didReject, didProgress, ret, receiver);
 
     if (target._isResolved() && !target._isSettlePromisesQueued()) {
-        async.invoke(
-            target._settlePromiseAtPostResolution, target, callbackIndex);
+        target._settlePromiseAtPostResolution(callbackIndex);
     }
 
     return ret;
@@ -2723,7 +2720,7 @@ Promise.prototype._settlePromiseAt = function (index) {
 
     if (isPromise && promise._isMigrated()) {
         promise._unsetIsMigrated();
-        return async.invoke(this._settlePromiseAt, this, index);
+        return this._settlePromiseAt(index);
     }
     var handler = this._isFulfilled()
         ? this._fulfillmentHandlerAt(index)
@@ -3734,7 +3731,7 @@ function ReductionPromiseArray(promises, fn, accum, _each) {
     if (!(isPromise || this._zerothIsAccum)) this._gotAccum = true;
     this._callback = fn;
     this._accum = accum;
-    if (!rejected) async.invoke(init, this, undefined);
+    if (!rejected) init.call(this, undefined);
 }
 function init() {
     this._init$(undefined, -5);
