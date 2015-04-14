@@ -225,6 +225,7 @@ function buildBrowser(sources, dir, tmpDir, depsRequireCode, minify, npmPackage,
                 code = astPasses.removeAsserts(code, sourceFileName);
                 code = astPasses.inlineExpansion(code, sourceFileName);
                 code = astPasses.expandConstants(code, sourceFileName);
+                code = astPasses.asyncConvert(code, "async", "invoke", sourceFileName);
                 code = code.replace( /__DEBUG__/g, "false" );
                 code = code.replace( /__BROWSER__/g, "true" );
                 if (sourceFileName === "promise.js") {
